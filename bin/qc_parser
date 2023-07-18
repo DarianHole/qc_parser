@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+''''''
+
+import argparse
+
+from qc_parser import __version__
+from qc_parser.tools.primers_to_amplicons import primers_to_amplicons
+from qc_parser.tools.get_qc import get_qc
+from qc_parser.tools.collect_qc_summary import collect_qc_summary
+
+def main() -> None:
+    '''Run the program'''
+    parser = argparse.ArgumentParser()
+    # Generic args
+    parser.add_argument(
+        '-v',
+        '--version',
+        help='Outputs the current version',
+        action='version',
+        version='%(prog)s {}'.format(__version__)
+    )
+    # Sub commands
+    subparsers = parser.add_subparsers(
+        title='subcommands', description='valid commands',
+        help='additional help', dest='command')
+    subparsers.required = True
+
+    # Command 1: Primers to Amplicons
+    sp_primers = subparsers.add_parser('primers_to_amplicons', help='Tool to create amplicon BED files')
+    sp_primers.add_argument('-p', '--primers', help='Primer scheme in BED format', required=True)
+    sp_primers.add_argument('--offset', default=0, help='Primer offset for coordinates')
+    sp_primers.add_argument('-o', '--output', default='out.bed',
+                        help='filename to write BED to')
+    sp_primers.add_argument('--bed_type', default='unique_amplicons',
+                        help='type of BED to produce (e.g. full, no_primers, unique-amplicons')
+    sp_primers.add_argument('--primer_prefix', default='nCoV-2019',
+                        help='the primer name prefix used in the BED file (default: nCoV-2019)')
+
+    # Command 2: Get QC
+    sp_qc = subparsers.add_parser('get_qc', help='Tool for summarizing QC data')
+    sp_qc.add_argument('-c', '--consensus', help='<sample>.consensus.fasta file to process')
+    sp_qc.add_argument('-v', '--variants',
+                        help='<sample>.variants.tsv file to process')
+    sp_qc.add_argument('-e', '--coverage',
+                        help='<sample>.per_base_coverage.bed file to process')
+    sp_qc.add_argument('-i', '--indel', action='store_true',
+                        help='flag to determine whether to count indels')
+    sp_qc.add_argument('-m', '--meta', default=None,
+                        help='full path to the metadata file')
+    sp_qc.add_argument('-a', '--alleles',
+                        help='full path to the alleles.tsv file')
+    sp_qc.add_argument('-s', '--sample',
+                        help='name of sample being processed')
+    sp_qc.add_argument('-x', '--mixture', default=None,
+                        help='full path to the mixture report')
+    sp_qc.add_argument('-p', '--platform', default='illumina',
+                        help='sequencing platform used')
+    sp_qc.add_argument('-r', '--run_name',
+                        help='run name for sample')
+    sp_qc.add_argument('-l', '--lineage',
+                        help='full path to the Pangolin lineage report')
+    sp_qc.add_argument('-t', '--aa_table',
+                        help='full path to the <sample>_aa_table.tsv file')
+    sp_qc.add_argument('-u', '--mutations',
+                        help='full path to the <run>_ncov_watch_variants.tsv file')
+    sp_qc.add_argument('--pangolin_version', required=False, default='4',
+                        help='Pangolin version used for lineage classification (default: 4)')
+
+    # Command 3: Collect QC
+    sp_qc_summary = subparsers.add_parser('collect_qc_summary', help='Tool for aggregating sample QC')
+    sp_qc_summary.add_argument('-p', '--path', required=True,
+                        help='directory to search for <sample>.summary.qc.tsv \
+                            files')
+
+    # Command 4: Whatever we want to add
+
+    # Parse
+    args = parser.parse_args()
+
+    # Execute the appropriate function based on the command
+    if args.command == 'primers_to_amplicons':
+        primers_to_amplicons(args)
+    elif args.command == 'get_qc':
+        get_qc(args)
+    elif args.command == 'collect_qc_summary':
+        collect_qc_summary(args)
+
+
+if __name__ == '__main__':
+    main()
+    

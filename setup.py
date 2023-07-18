@@ -1,20 +1,21 @@
 '''
-Setup.py file for the ncov_parser package.
+Setup.py file for the qc_parser package.
 '''
 import setuptools
+from qc_parser import __version__, _package_name
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="ncov_parser",
-    version="0.7.0",
-    author="Richard J. de Borja",
-    author_email="richard.deborja@oicr.on.ca",
-    description="A nCoV package for parsing analysis files",
+    name=_package_name,
+    version=__version__,
+    author="Darian Hole, Original: Richard J. de Borja",
+    author_email="darian.hole@phac-aspc.gc.ca",
+    description="A package for parsing viral qc analysis files",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/rdeborja/ncov_parser",
+    url="https://github.com/DarianHole/qc_parser",
     packages=setuptools.find_packages(),
     license="MIT",
     classifiers=[
@@ -22,8 +23,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
-    scripts=['bin/get_qc.py',
-             'bin/collect_qc_summary.py',
-             'bin/primers_to_amplicons.py']
+    python_requires='>=3.9',
+    scripts=['bin/qc_parser']
 )
