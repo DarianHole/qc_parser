@@ -7,6 +7,7 @@ from qc_parser import __version__
 from qc_parser.tools.primers_to_amplicons import primers_to_amplicons
 from qc_parser.tools.get_qc import get_qc
 from qc_parser.tools.collect_qc_summary import collect_qc_summary
+from qc_parser.tools.ambiguous_position_check import ambiguous_positions_check
 
 def main() -> None:
     '''Run the program'''
@@ -72,7 +73,12 @@ def main() -> None:
                         help='directory to search for <sample>.summary.qc.tsv \
                             files')
 
-    # Command 4: Whatever we want to add
+    # Command 4: Ambiguous Positions Check
+    sp_ambiguous_check = subparsers.add_parser('ambiguous_check', help='Tool for generating a report on genomic positions that have frequent ambiguous variants')
+    sp_ambiguous_check.add_argument('-a', '--alleles', required=True,
+                        help='full path to the alleles.tsv file')
+    sp_ambiguous_check.add_argument('-m', '--min-count', type=int, default=3,
+                        help='Report all positions that have more than m ambiguous observations')
 
     # Parse
     args = parser.parse_args()
@@ -84,7 +90,8 @@ def main() -> None:
         get_qc(args)
     elif args.command == 'collect_qc_summary':
         collect_qc_summary(args)
-
+    elif args.command == 'ambiguous_check':
+        ambiguous_positions_check(args)
 
 if __name__ == '__main__':
     main()
